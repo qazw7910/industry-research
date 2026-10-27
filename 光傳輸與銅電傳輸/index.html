@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>銅轉光研究心智圖</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif; }
+  body { background: #fff; color: #1b2328; }
+  #mm { width: 100%; height: 100%; display: block; }
+  #msg { position: fixed; top: 12px; left: 16px; font-size: 13px; color: #5d6a72; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0f1518; color: #e4eaed; }
+    #mm { --markmap-text-color: #e4eaed; }
+  }
+</style>
+</head>
+<body>
+<div id="msg">載入中…</div>
+<svg id="mm"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.18.12/dist/browser/index.iife.js"></script>
+<script>
+  // 心智圖內容來自同資料夾的 Markdown 檔，編輯那個檔案即可
+  const SOURCE = "銅轉光心智圖.md";
+  const { Transformer, Markmap, deriveOptions } = window.markmap;
+  fetch(encodeURI(SOURCE))
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(md => {
+      const { root, frontmatter } = new Transformer().transform(md);
+      const fm = frontmatter || {};
+      if (fm.title) document.title = fm.title;
+      Markmap.create("#mm", deriveOptions(fm.markmap || {}), root);
+      document.getElementById("msg").remove();
+    })
+    .catch(err => {
+      document.getElementById("msg").textContent =
+        "無法讀取 " + SOURCE + "（" + err.message + "）。直接雙擊開檔時瀏覽器會擋住讀取，請用 GitHub Pages 或 VS Code 的 Markmap 擴充功能預覽。";
+    });
+</script>
+</body>
+</html>
